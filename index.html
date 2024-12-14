@@ -125,6 +125,7 @@
             }
 
             .slot-item {
+                padding: 1rem;
                 font-size: 0.7rem;
                 height: 35px;
             }
@@ -137,7 +138,8 @@
             }
 
             .slot-item {
-                font-size: 0.5rem;
+                padding: 1rem;
+                font-size: 0.4rem;
                 height: 30px;
             }
         }
@@ -342,14 +344,19 @@ class SlotMachine {
     }
 
     generateComplexSlotData() {
+        const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        
         return Array.from({ length: 420 }, (_, i) => {
             const id = i + 1;
             const negativeData = -(420 - i);
             const data1 = (i % 60) + 1;
             const data2 = Math.floor(i / 12) % 50 + 1;
+            const dayIndex = i % 7;
+            const dayLabel = days[dayIndex];
+            
             return {
                 id,
-                value: `${id}/${negativeData}/${data1}/${data2}`,
+                value: `${dayLabel} ${id}/${negativeData}/${data1}/${data2}`,
                 index: i
             };
         });
@@ -404,31 +411,30 @@ class Slot {
         this.items = data;
         this.renderItems();
         
-        // Calculate initial position to show "1" in center
         const totalHeight = this.items.length * this.itemHeight;
-        const initialRotation = (totalHeight / 3) - this.itemHeight; // Position at first "1"
+        const initialRotation = (totalHeight / 3) - this.itemHeight;
         this.currentRotation = initialRotation;
         this.updatePosition(initialRotation);
     }
 
     renderItems() {
-            this.content.innerHTML = '';
-            const itemsToRender = [...this.items, ...this.items, ...this.items];
-            
-            itemsToRender.forEach((item, index) => {
-                const element = document.createElement('div');
-                element.className = `slot-item ${this.getBackgroundClass(index)}`;
-                element.textContent = item.value;
-                element.dataset.index = index;
-                this.content.appendChild(element);
-            });
+        this.content.innerHTML = '';
+        const itemsToRender = [...this.items, ...this.items, ...this.items];
+        
+        itemsToRender.forEach((item, index) => {
+            const element = document.createElement('div');
+            element.className = `slot-item ${this.getBackgroundClass(index)}`;
+            element.textContent = item.value;
+            element.dataset.index = index;
+            this.content.appendChild(element);
+        });
     }
 
     getBackgroundClass(index) {
-            const groupSize = 7;
-            const groupIndex = Math.floor(index / groupSize) % 2;
-            return groupIndex === 0 ? 'bg-light-grey' : 'bg-white';
-        }
+        const groupSize = 7;
+        const groupIndex = Math.floor(index / groupSize) % 2;
+        return groupIndex === 0 ? 'bg-light-grey' : 'bg-white';
+    }
 
     onStart(e) {
         if (this.isDragging) return;
@@ -466,67 +472,35 @@ class Slot {
     }
 
     onEnd() {
-    if (!this.isDragging) return;
-    this.isDragging = false;
+        if (!this.isDragging) return;
+        this.isDragging = false;
 
-    if (Math.abs(this.velocity) > 0.1) {
-        this.applyMomentum();
-    } else {
-        // หากไม่ต้องการให้ snap ก็สามารถใส่ logic อื่น หรือปล่อยว่าง
-        console.log('Drag ended without snapping.');
-    }
-}
-
-
-applyMomentum() {
-    const decay = 0.95;
-    const minVelocity = 0.1;
-    let currentVelocity = this.velocity * 20;
-
-    const animate = () => {
-        currentVelocity *= decay;
-        this.currentRotation -= currentVelocity;
-        this.updatePosition(this.currentRotation);
-
-        if (Math.abs(currentVelocity) > minVelocity) {
-            this.animation = requestAnimationFrame(animate);
+        if (Math.abs(this.velocity) > 0.1) {
+            this.applyMomentum();
         } else {
-            // ลบการเรียก snapToNearest ที่นี่
-            console.log('Momentum ended.');
+            console.log('Drag ended without snapping.');
         }
-    };
+    }
 
-    this.animation = requestAnimationFrame(animate);
-}
+    applyMomentum() {
+        const decay = 0.95;
+        const minVelocity = 0.1;
+        let currentVelocity = this.velocity * 20;
 
+        const animate = () => {
+            currentVelocity *= decay;
+            this.currentRotation -= currentVelocity;
+            this.updatePosition(this.currentRotation);
 
-    // snapToNearest() {
-//     const totalHeight = this.items.length * this.itemHeight;
-//     let targetRotation = Math.round(this.currentRotation / this.itemHeight) * this.itemHeight;
+            if (Math.abs(currentVelocity) > minVelocity) {
+                this.animation = requestAnimationFrame(animate);
+            } else {
+                console.log('Momentum ended.');
+            }
+        };
 
-//     targetRotation = this.normalizeRotation(targetRotation, totalHeight);
-
-//     const startRotation = this.currentRotation;
-//     const distance = targetRotation - startRotation;
-//     const duration = 300;
-//     const startTime = performance.now();
-
-//     const animate = (currentTime) => {
-//         const elapsed = currentTime - startTime;
-//         const progress = Math.min(elapsed / duration, 1);
-//         const easeProgress = 1 - Math.pow(1 - progress, 3);
-
-//         this.currentRotation = startRotation + (distance * easeProgress);
-//         this.updatePosition(this.currentRotation);
-
-//         if (progress < 1) {
-//             this.animation = requestAnimationFrame(animate);
-//         }
-//     };
-
-//     this.animation = requestAnimationFrame(animate);
-// }
-
+        this.animation = requestAnimationFrame(animate);
+    }
 
     normalizeRotation(rotation, totalHeight) {
         const normalizedRotation = rotation % totalHeight;
@@ -560,7 +534,6 @@ applyMomentum() {
         }
     }
 }
-
 
     </script>
 </body>
