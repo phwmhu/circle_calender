@@ -3,169 +3,201 @@
 <head>
   <title>Concentric Circles Visualization</title>
   <script src="https://d3js.org/d3.v6.min.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="format-detection" content="telephone=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
   <style>
-   /* Base styles */
-body {
-  font-family: Arial, Helvetica, sans-serif;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  overflow: hidden;
-  touch-action: none;
-  position: fixed;
-  width: 100%;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  overscroll-behavior: none;
-}
+    /* Base styles */
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      touch-action: none;
+      position: fixed;
+      width: 100%;
+      -webkit-user-select: none;
+      user-select: none;
+      overscroll-behavior: none;
+    }
 
-html {
-  overscroll-behavior: none;
-  touch-action: none;
-  position: fixed;
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-}
+    html {
+      overscroll-behavior: none;
+      touch-action: none;
+      position: fixed;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+    }
 
-/* Chart container */
-#chart {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-  touch-action: none;
-  -webkit-touch-callout: none;
-}
+    /* Chart container */
+    #chart {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      touch-action: none;
+      -webkit-touch-callout: none;
+    }
 
-/* Title styling */
-.title {
-  font-size: 24px;
-  margin-bottom: 20px;
-  pointer-events: none;
-}
+    /* Controls container */
+    #controls {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-/* SVG specific styles */
-svg {
-  touch-action: none;
-  transform-origin: center;
-  transition: transform 0.1s ease-out;
-  -webkit-tap-highlight-color: transparent;
-}
+    /* Control groups */
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px;
+    }
 
-/* Text elements in SVG */
-svg text {
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  pointer-events: none;
-  dominant-baseline: middle;
-  font-family: Arial, sans-serif;
-}
+    /* Sliders */
+    .slider {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: #ddd;
+      border-radius: 3px;
+      outline: none;
+    }
 
-/* Zoom and pan container */
-.zoom-pan-container {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  touch-action: none;
-  transform-origin: 0 0;
-  will-change: transform;
-  transition: transform 0.1s ease-out;
-}
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #4CAF50;
+      border-radius: 50%;
+      cursor: pointer;
+    }
 
-/* Path elements in SVG */
-svg path {
-  transition: fill 0.2s ease;
-  cursor: pointer;
-}
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: #4CAF50;
+      border-radius: 50%;
+      cursor: pointer;
+    }
 
-/* Hover effects for desktop */
-@media (hover: hover) {
-  svg path:hover {
-    filter: brightness(0.95);
-  }
-}
+    /* Labels */
+    .control-label {
+      min-width: 60px;
+      font-size: 14px;
+      color: #333;
+    }
 
-/* Mobile specific styles */
-@media (max-width: 768px) {
-  svg text {
-    font-size: calc(8px + 1vmin) !important;
-  }
-}
+    /* Pan controls */
+    .pan-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      margin: 5px;
+    }
 
-/* Prevent text selection */
-* {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
+    .pan-button {
+      padding: 10px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      touch-action: none;
+    }
 
-/* Touch feedback styles */
-.touch-active {
-  opacity: 0.8;
-}
+    .pan-button:active {
+      background: #45a049;
+    }
 
-/* Ensure smooth animations */
-* {
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-transform-style: preserve-3d;
-  transform-style: preserve-3d;
-}
+    /* Reset button */
+    .reset-button {
+      padding: 8px;
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 14px;
+    }
 
-/* Handle iOS Safari overscroll behavior */
-@supports (-webkit-overflow-scrolling: touch) {
-  body {
-    position: fixed;
-    width: 100%;
-  }
-}
+    /* SVG styling */
+    svg {
+      touch-action: none;
+      transform-origin: center;
+      transition: transform 0.1s ease-out;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-/* Ensure proper rendering on high DPI screens */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  svg {
-    shape-rendering: geometricPrecision;
-  }
-}
+    svg text {
+      user-select: none;
+      -webkit-user-select: none;
+      pointer-events: none;
+      dominant-baseline: middle;
+      font-family: Arial, sans-serif;
+    }
 
-/* Prevent elastic scrolling on iOS */
-body {
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
+    .zoom-pan-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      transform-origin: 0 0;
+      will-change: transform;
+    }
 
-/* Optimize for touch devices */
-@media (pointer: coarse) {
-  .zoom-pan-container {
-    touch-action: none;
-    -ms-touch-action: none;
-  }
-}
+    @media (max-width: 768px) {
+      svg text {
+        font-size: calc(8px + 1vmin) !important;
+      }
+      
+      .control-group {
+        padding: 3px;
+      }
+      
+      .pan-button {
+        padding: 8px;
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
   <div id="chart"></div>
-
+  <div id="controls">
+    <div class="control-group">
+      <span class="control-label">Zoom:</span>
+      <input type="range" class="slider" id="zoom-slider" min="50" max="200" value="100">
+    </div>
+    <div class="pan-controls">
+      <button class="pan-button" id="pan-left">←</button>
+      <button class="pan-button" id="pan-up">↑</button>
+      <button class="pan-button" id="pan-right">→</button>
+      <button class="pan-button" id="pan-reset">•</button>
+      <button class="pan-button" id="pan-down">↓</button>
+      <button class="reset-button" id="reset-all">Reset All</button>
+    </div>
+  </div>
   <script>
     // Updated data for each circle
     const rawData1 = `1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0`;
@@ -182,7 +214,7 @@ const rawData5 = `1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24
 
 const rawData6 = `1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0`;
    
-// Keep your existing rawData1 through rawData6 declarations here...
+// Keep existing rawData1 through rawData6 declarations here...
 
 // Improved data parsing function
 function parseCircleData(rawData, format) {
@@ -201,7 +233,7 @@ function parseCircleData(rawData, format) {
   }
 }
 
-// Circle configurations with adjusted radiuses
+// Circle configurations
 const circleData = [
   { data: parseCircleData(rawData1, 'simple'), radius: 200, name: 'circle1' },
   { data: parseCircleData(rawData2, 'simple'), radius: 280, name: 'circle2' },
@@ -218,12 +250,8 @@ const margin = Math.min(width, height) * 0.1;
 let currentScale = 1;
 let currentTranslateX = 0;
 let currentTranslateY = 0;
-let initialDistance = 0;
-let initialScale = 1;
-let isPanning = false;
-let lastTouchX = 0;
-let lastTouchY = 0;
-let isZooming = false;
+let isRotating = false;
+const PAN_STEP = 20; // Pixels to move per pan button press
 
 // Create container and SVG
 const container = d3.select("#chart")
@@ -264,8 +292,7 @@ function clientToSVGCoordinates(clientX, clientY) {
   const pt = svg.node().createSVGPoint();
   pt.x = clientX;
   pt.y = clientY;
-  const svgP = pt.matrixTransform(svg.node().getScreenCTM().inverse());
-  return svgP;
+  return pt.matrixTransform(svg.node().getScreenCTM().inverse());
 }
 
 // Update circle function
@@ -306,66 +333,72 @@ function updateCircle(circle, rotation = 0) {
   circle.group.attr("transform", `translate(${center.x}, ${center.y}) rotate(${rotation})`);
 }
 
-// Handle zoom function
-function handleZoom(event) {
-  if (event.touches && event.touches.length === 2) {
-    event.preventDefault();
-    isZooming = true;
-    
-    const touch1 = event.touches[0];
-    const touch2 = event.touches[1];
-    const distance = Math.hypot(
-      touch2.clientX - touch1.clientX,
-      touch2.clientY - touch1.clientY
-    );
-
-    if (initialDistance === 0) {
-      initialDistance = distance;
-      initialScale = currentScale;
-    } else {
-      const newScale = initialScale * (distance / initialDistance);
-      currentScale = Math.min(Math.max(newScale, 0.5), 2.5);
-      
-      // Calculate zoom center
-      const centerX = (touch1.clientX + touch2.clientX) / 2;
-      const centerY = (touch1.clientY + touch2.clientY) / 2;
-      
-      container.style("transform", 
-        `translate(${currentTranslateX}px, ${currentTranslateY}px) scale(${currentScale})`);
-    }
-  }
+// Update transformation
+function updateTransform() {
+  container.style("transform", 
+    `translate(${currentTranslateX}px, ${currentTranslateY}px) scale(${currentScale})`);
 }
 
-// Handle pan function
-function handlePan(event) {
-  if (event.touches && event.touches.length === 2 && !isZooming) {
-    event.preventDefault();
-    const touch1 = event.touches[0];
-    const touch2 = event.touches[1];
-    const currentX = (touch1.clientX + touch2.clientX) / 2;
-    const currentY = (touch1.clientY + touch2.clientY) / 2;
-    
-    if (!isPanning) {
-      isPanning = true;
-      lastTouchX = currentX;
-      lastTouchY = currentY;
-    } else {
-      const deltaX = (currentX - lastTouchX) / currentScale;
-      const deltaY = (currentY - lastTouchY) / currentScale;
-      currentTranslateX += deltaX;
-      currentTranslateY += deltaY;
-      container.style("transform", 
-        `translate(${currentTranslateX}px, ${currentTranslateY}px) scale(${currentScale})`);
-      lastTouchX = currentX;
-      lastTouchY = currentY;
-    }
-  }
+// Initialize controls
+function initializeControls() {
+  // Zoom slider
+  const zoomSlider = document.getElementById('zoom-slider');
+  zoomSlider.addEventListener('input', (e) => {
+    currentScale = e.target.value / 100;
+    updateTransform();
+  });
+
+  // Pan buttons
+  document.getElementById('pan-left').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    currentTranslateX += PAN_STEP;
+    updateTransform();
+  });
+
+  document.getElementById('pan-right').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    currentTranslateX -= PAN_STEP;
+    updateTransform();
+  });
+
+  document.getElementById('pan-up').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    currentTranslateY += PAN_STEP;
+    updateTransform();
+  });
+
+  document.getElementById('pan-down').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    currentTranslateY -= PAN_STEP;
+    updateTransform();
+  });
+
+  // Reset pan
+  document.getElementById('pan-reset').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    currentTranslateX = 0;
+    currentTranslateY = 0;
+    updateTransform();
+  });
+
+  // Reset all
+  document.getElementById('reset-all').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    currentScale = 1;
+    currentTranslateX = 0;
+    currentTranslateY = 0;
+    zoomSlider.value = 100;
+    circles.forEach(circle => {
+      circle.currentRotation = 0;
+      updateCircle(circle, 0);
+    });
+    updateTransform();
+  });
 }
 
-// Initialize circles and event handlers
+// Initialize circle rotation handlers
 circles.forEach(circle => {
   let startAngle = 0;
-  let isRotating = false;
   let activeCircle = null;
 
   function handleStart(clientX, clientY, targetCircle) {
@@ -396,26 +429,9 @@ circles.forEach(circle => {
   function handleEnd() {
     isRotating = false;
     activeCircle = null;
-    initialDistance = 0;
-    isPanning = false;
-    isZooming = false;
   }
 
-  // Mouse events
-  svg.on("mousedown.circle" + circle.name, function(event) {
-    event.preventDefault();
-    handleStart(event.clientX, event.clientY, circle);
-  });
-
-  svg.on("mousemove.circle" + circle.name, function(event) {
-    event.preventDefault();
-    handleMove(event.clientX, event.clientY);
-  });
-
-  svg.on("mouseup.circle" + circle.name, handleEnd);
-  svg.on("mouseleave.circle" + circle.name, handleEnd);
-
-  // Touch events
+  // Touch events for rotation
   svg.on("touchstart.circle" + circle.name, function(event) {
     event.preventDefault();
     if (event.touches.length === 1) {
@@ -436,31 +452,11 @@ circles.forEach(circle => {
   svg.on("touchcancel.circle" + circle.name, handleEnd);
 });
 
-// Add zoom and pan event listeners
-container.node().addEventListener('touchstart', handleZoom, { passive: false });
-container.node().addEventListener('touchmove', (event) => {
-  handleZoom(event);
-  handlePan(event);
-}, { passive: false });
-container.node().addEventListener('touchend', () => {
-  initialDistance = 0;
-  isPanning = false;
-  isZooming = false;
-}, { passive: false });
-
 // Prevent default browser behaviors
 document.addEventListener('touchmove', function(e) {
   if (e.touches.length > 1) {
     e.preventDefault();
   }
-}, { passive: false });
-
-document.addEventListener('gesturestart', function(e) {
-  e.preventDefault();
-}, { passive: false });
-
-document.addEventListener('gesturechange', function(e) {
-  e.preventDefault();
 }, { passive: false });
 
 // Responsive design
@@ -477,7 +473,9 @@ function resizeChart() {
   });
 }
 
+// Event listeners
 window.addEventListener('resize', resizeChart);
+window.addEventListener('load', initializeControls);
 
 // Initial draw
 circles.forEach(circle => updateCircle(circle));
