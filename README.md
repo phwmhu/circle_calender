@@ -1,72 +1,91 @@
-# Interactive Circular Visualization
+# Calendar Wheel UI
 
-An interactive circular visualization built with D3.js that allows users to manipulate and explore data in concentric circles. The visualization includes features like rotation, zooming, and touch interactions.
+An interactive, mobile-friendly calendar interface featuring a slot machine-style date selection system with six synchronized wheels.
 
 ## Features
 
-- Interactive rotating circles
-- Multiple concentric circles displaying different data sets
-- Touch and mouse interaction support
-- Zoom and pan capabilities
-- Responsive design that adapts to screen size
-- Alternating background colors for better readability
-- Support for both simple and complex data formats
+- Six interactive rotatable wheels for date selection
+- Smooth scrolling with momentum and touch support
+- Day of week labels (SUN-SAT) with corresponding dates
+- Responsive design for mobile and desktop
+- Visual feedback with alternating row colors
+- Center marker for precise selection
+- Mobile-optimized with touch event handling
 
-## Versions
+## Setup
 
-The project includes several HTML files with different functionalities:
+1. Include required CDN:
+```html
+<link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet">
+```
 
-1. `index.html` - Basic circular visualization with rotation
-2. `concentric.html` - Multiple concentric circles with independent rotation
-3. `zoom.html` - Enhanced version with zoom and pan capabilities
+2. Add the HTML structure:
+```html
+<div class="slot-machine">
+    <div class="slot" data-slot="1">
+        <div class="slot-content"></div>
+        <div class="center-marker"></div>
+    </div>
+    <!-- Repeat for slots 2-6 -->
+</div>
+```
 
-## Technologies Used
+## Wheel Configuration
 
-- D3.js (v6)
-- HTML5
-- CSS3
-- JavaScript (ES6+)
+The interface consists of 6 wheels with different data ranges:
+- Wheel 1: 1-365 + 55 zeros
+- Wheel 2: 1-366 + 54 zeros
+- Wheel 3: Complex date format with day labels
+- Wheel 4: 1-354 + 66 zeros
+- Wheel 5: 1-355 + 65 zeros
+- Wheel 6: 1-384 + 36 zeros
+
+## Mobile Optimization
+
+- Prevents default scroll behavior
+- Supports touch events
+- Responsive font sizing
+- Hardware-accelerated animations
+- Smooth momentum scrolling
+
+## Browser Support
+
+- Modern browsers (Chrome, Firefox, Safari, Edge)
+- Mobile browsers with touch support
+- iOS Safari with momentum scrolling
 
 ## Usage
 
-Open any of the HTML files in a modern web browser. The visualization supports:
+Initialize the calendar wheel:
 
-- **Mouse Controls:**
-  - Click and drag to rotate circles
-  - Mouse wheel to zoom (where applicable)
+```javascript
+document.addEventListener('DOMContentLoaded', () => {
+    const slotMachine = new SlotMachine();
+});
+```
 
-- **Touch Controls:**
-  - Single finger drag to rotate
-  - Two-finger pinch to zoom
-  - Two-finger drag to pan
+## Custom Styling
 
-## Data Structure
+The interface uses CSS variables for easy customization:
 
-The visualization supports two data formats:
+```css
+:root {
+    --slot-width: min(15vw, 180px);
+    --slot-height: 80vh;
+    --slot-background: #f0f0f0;
+    --slot-border: #ccc;
+    --text-color: #333;
+    --selected-color: #007bff;
+}
+```
 
-1. Simple Format: Sequential numbers (1-365/366)
-2. Complex Format: Combined data points (id/value1/value2/value3)
+## Performance
 
-## Browser Compatibility
-
-Tested and working in:
-- Chrome
-- Firefox
-- Safari
-- Edge
-
-## Local Development
-
-To run locally:
-1. Clone the repository
-2. Open any of the HTML files in a web browser
-3. No server required - files can run directly in the browser
+- Uses requestAnimationFrame for smooth animations
+- Hardware-accelerated transforms
+- Efficient DOM updates
+- Optimized touch event handling
 
 ## License
 
-MIT
-
-## Acknowledgments
-
-- D3.js library and community
-- Built with support for both desktop and mobile devices
+MIT License
